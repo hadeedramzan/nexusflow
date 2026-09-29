@@ -2,7 +2,7 @@
 
 A small CRM for inbound leads. Add a lead, let an LLM score it and draft an opening email line, then move it through your pipeline on a Kanban board.
 
-**Live demo:** https://nexusflow-jzkgoemfj-hadeed-ramzan.vercel.app/
+**Live demo:** https://nexusflow-ecru.vercel.app/
 **Source:** https://github.com/hadeedramzan/nexusflow
 
 ![NexusFlow board](docs/screenshot.png)
