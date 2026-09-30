@@ -1,2 +1,5 @@
 @import "tailwindcss";
 body { background: #f3f5f7; color: #14202b; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.card-in { animation: rise 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .card-in { animation: none; } }
