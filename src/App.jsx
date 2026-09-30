@@ -22,6 +22,9 @@ const TONES = {
   cold: { label: "Cold", box: "bg-red-50", title: "text-red-900", bar: "bg-red-500", track: "bg-red-100", badge: "bg-red-600" },
 };
 const toneOf = (s) => (s >= 70 ? TONES.hot : s >= 40 ? TONES.warm : TONES.cold);
+const SOURCES = { web_form: "Web form", manual: "Manual", sample: "Sample" };
+const PERSONAL = ["gmail.com", "googlemail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com", "icloud.com", "aol.com", "proton.me", "protonmail.com"];
+const emailKind = (e) => (PERSONAL.includes(String(e || "").split("@")[1]?.toLowerCase()) ? "Personal email" : "Company email");
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700";
 const money = (n) => (n == null || n === "" ? "" : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n));
 // quote every cell and neutralise spreadsheet formulas (=, +, -, @)
@@ -98,9 +101,9 @@ export default function App() {
     e.preventDefault();
     const dup = leads.some((l) => (l.email || "").toLowerCase() === form.email.trim().toLowerCase());
     if (dup && !window.confirm("A lead with this email already exists. Add it anyway?")) return;
-    if (await insert(form)) { setForm(EMPTY); setPanel(null); notify("Lead added", "ok"); }
+    if (await insert({ ...form, source: "manual" })) { setForm(EMPTY); setPanel(null); notify("Lead added", "ok"); }
   }
-  const addSample = () => insert(SAMPLES[Math.floor(Math.random() * SAMPLES.length)]);
+  const addSample = () => insert({ ...SAMPLES[Math.floor(Math.random() * SAMPLES.length)], source: "sample" });
 
   async function move(id, status) {
     setLeads((l) => l.map((x) => (x.id === id ? { ...x, status } : x)));
@@ -134,7 +137,7 @@ export default function App() {
   }
 
   function exportCsv() {
-    const cols = ["name", "email", "company", "status", "score", "deal_value", "message", "notes", "created_at"];
+    const cols = ["name", "email", "company", "status", "source", "score", "deal_value", "message", "notes", "created_at"];
     const csv = [cols.join(","), ...shown.map((l) => cols.map((c) => csvCell(l[c])).join(","))].join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     const a = document.createElement("a");
@@ -319,6 +322,10 @@ export default function App() {
                           <div>
                             <p className="font-medium">{l.name}</p>
                             <p className="text-xs text-slate-500">{l.company || l.email}</p>
+                            <p className="mt-1 flex flex-wrap gap-1">
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700">{SOURCES[l.source] || "Manual"}</span>
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700">{emailKind(l.email)}</span>
+                            </p>
                           </div>
                           <div className="flex gap-2 text-xs">
                             <button onClick={() => startLeadEdit(l)} aria-label={`Edit ${l.name}`} className={`text-slate-600 hover:text-teal-800 ${focus}`}>Edit</button>
